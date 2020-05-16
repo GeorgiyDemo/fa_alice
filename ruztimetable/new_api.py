@@ -28,13 +28,15 @@ app = Flask(__name__)
 api = Api(app)
 
 def search_group(group_name):
+    """Метод поиска группы"""
+    pass
+
 
 
 def get_timetable(group_name):
 
     #Фикс группы из-за распознавания Алисы
     group_name = group_name.replace(" ","")
-    out_str = ""
     fa = FaAPI()
 
     #Получаем информацию о группе
@@ -50,6 +52,7 @@ def get_timetable(group_name):
         if len(timetable) == 0:
             return "Сегодня пар нет, отдыхайте!"
 
+        out_str = "Расписание группы ПИ19-4 на 01.02.2020:\n"
         for i in range(len(timetable)):
             out_str +="{}. {}\n".format(i+1,timetable[i]["discipline"])
         
