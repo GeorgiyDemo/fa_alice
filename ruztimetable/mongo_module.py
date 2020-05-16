@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta
 
 import pymongo
-import os
-
+import yaml
 class MongoClass:
     """Родительский класс для установки соединения"""
     
     def __init__(self):
-        connection_str = "mongodb://{}:{}@{}:27017/".format(os.environ['MONGO_LOGIN'], os.environ['MONGO_PASSWORD'], os.environ['MONGO_HOST'])
+
+        #with open("./settings.yml", 'r') as stream:
+        connection_str = ""
         myclient = pymongo.MongoClient(connection_str)
         self.connection = myclient['fa_alice']
 
@@ -21,7 +22,7 @@ class MongoUserClass(MongoClass):
     def find_user(self, user_id):
         """Возвращает boolean результат поиска пользователя в БД"""
         r = self.users_table.find_one({"user_id" : user_id})
-        if len(r) == 0:
+        if r is None:
             return True
         return False
     
