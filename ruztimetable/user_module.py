@@ -33,7 +33,7 @@ class UserCommandsClass():
         if command in router_dict:
             router_dict[command]()
         else:
-            self.out_str = "Извини, я тебя не поняла"
+            self.out_str = "Извини, я тебя не поняла.\nСкажи 'Помощь' и я помогу"
             self.out_buttons = self.defaultbutton
 
     def changegroup(self):

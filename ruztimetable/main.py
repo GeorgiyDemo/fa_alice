@@ -33,16 +33,21 @@ def main():
     out_dict = {}
     req = request.json
     user_id = req['session']['user_id']
+    user_command = req["request"]["command"]
 
+    #Помощь и объяснение того, что происходит
+    if "Помощь" in user_command or "Что ты умеешь" in user_command:
+        string = "Для начала мне необходимо узнать твою группу. После этого у тебя появляется возможность получить расписание на сегодня, завтра и послезавтра одноименными командами.\nЕсли решил изменить свою группу, то скажи 'Изменение группы'"
+        out_dict = UtilClass.json_generator(string)
+    
     # Если новый пользователь и его нет в таблице, значит это самое начало
-    if req['session']['new'] and mongo.find_user(user_id):
-        out_dict = UtilClass.json_generator(
-            "Привет, для начала скажи название своей группы")
+    elif req['session']['new'] and mongo.find_user(user_id):
+        string = "Привет, я подскажу твое расписание в Финансовом Университете при Правительстве РФ\nДля начала скажи название своей группы"
+        out_dict = UtilClass.json_generator(string)
 
     # Если новый пользователь сказал название группы
     elif mongo.find_user(user_id):
 
-        user_command = req["request"]["command"]
 
         agreement_words = ["ага", "Ага", "Ды", "Да", "да",
                            "ды", "верно", "Верно", "Правильно", "правильно"]
@@ -72,14 +77,14 @@ def main():
 
         # Пользователь всёж сказал именно название группы
         else:
-            user_command = req["request"]["command"]
+
             # Ищем группу
             search_flag, search_dict = UtilClass.search_group(user_command)
             if not search_flag:
                 out_dict = UtilClass.json_generator(
                     "Я не смогла найти твою группу, извини.\nМожет попробуешь назвать ее заново?")
             else:
-                string = "Твоя группа {} и относится к {}, правильно ?".format(search_dict["group_name"],
+                string = "Твоя группа {} и относится к {}, правильно?".format(search_dict["group_name"],
                                                                                search_dict["description"])
                 out_dict = UtilClass.json_generator(string, ["Да", "Нет"])
                 buf_userdict[user_id] = search_dict
@@ -87,7 +92,6 @@ def main():
     else:
 
         # Если действующий пользователь, то даем ему одно из расписаний
-        user_command = req["request"]["command"]
         obj = UserCommandsClass(user_id, user_command)
         out_dict = UtilClass.json_generator(obj.out_str, obj.out_buttons, obj.end_session)
 
