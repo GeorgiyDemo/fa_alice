@@ -17,114 +17,81 @@
 """
 
 from flask import Flask, request
-from flask_restful import Resource, Api
+from flask_restful import Resource
 import json
-from fa_api import FaAPI
 from mongo_module import MongoUserClass
 from user_module import UserCommandsClass
+from util_module import UtilClass
 
 app = Flask(__name__)
-api = Api(app)
 mongo = MongoUserClass()
-
-
 buf_userdict = {}
-class MainClass(Resource):
-
-    #TODO
-    def json_generator(self, text, buttons=None):
-        """Генерация ответа в json"""
-        
-        out_dict = {
-            "response":
-                {"end_session": False, 
-                },
-            "version": "1.0",    
-        }
-
-        out_dict['response']['text'] = text
-        if buttons is not None:
-            out_dict['response']['buttons'] = [{"title": txt,"hide": True} for txt in buttons]
-
-        return out_dict
-
-    def search_group(self, group_name):
-        """Поиск группы"""
-
-        group_name = group_name.replace(" ","")
-        
-        fa = FaAPI()
-        #Получаем информацию о группе
-        groups = fa.search_group(group_name)
-
-        if len(groups) != 1:
-            return False, {}
-
-        description = groups[0]["description"]
-        if "|" in description:
-            description, _ = description.split("|")
-        
-        return True, {"description" : description, "group_name" : groups[0]["label"], "group_id": groups[0]["id"]}
 
 
-    def post(self):
+@app.route('/', methods=['POST'])
+def main():
+    """Управляющая логика обработки входящего запроса на Flask"""
 
-        out_dict = {}
+    out_dict = {}
+    req = request.json
+    user_id = req['session']['user_id']
 
-        req = request.json
-        user_id = req['session']['user_id']
+    # Если новый пользователь и его нет в таблице, значит это самое начало
+    if req['session']['new'] and mongo.find_user(user_id):
+        out_dict = UtilClass.json_generator(
+            "Привет, для начала скажи название своей группы")
 
-        #Если новый пользователь и его нет в таблице, значит это самое начало
-        if req['session']['new'] and mongo.find_user(user_id):
-            out_dict = self.json_generator("Привет, для начала скажи название своей группы")
-        
-        #Если новый пользователь сказал название группы
-        elif mongo.find_user(user_id):
-            
-            user_command = req["request"]["command"]
+    # Если новый пользователь сказал название группы
+    elif mongo.find_user(user_id):
 
-            agreement_words = ["ага","Ага","Ды", "Да", "да", "ды","верно","Верно","Правильно","правильно"]
-            disagreement_words = ["не","Нет", "Не", "Нит","неправильно","неверно","Неверно","Неправильно"]
-            
-            #Если пользователь согласился с тем, что это его группа
-            if user_command in agreement_words and user_id in buf_userdict:
-                user_data = buf_userdict[user_id]
+        user_command = req["request"]["command"]
 
-                mongo.set_usergroup(user_id, user_data["group_id"], user_data["group_name"])
-                message_str = "Хорошо, я выставила группу {} для вас. Скажите \"расписание на сегодня\" для получения расписания.\nТакже могу подсказать расписание на завтра и любую другую дату".format(user_data["group_name"])
-                out_dict = self.json_generator(message_str,["Расписание на сегодня","Расписание на завтра","Изменение группы"])
-                del buf_userdict[user_id]
+        agreement_words = ["ага", "Ага", "Ды", "Да", "да",
+                           "ды", "верно", "Верно", "Правильно", "правильно"]
+        disagreement_words = ["не", "Нет", "Не", "Нит",
+                              "неправильно", "неверно", "Неверно", "Неправильно"]
 
-            #Если пользователь не согласился со своей группой
+        # Если пользователь согласился с тем, что это его группа
+        if user_command in agreement_words and user_id in buf_userdict:
+            user_data = buf_userdict[user_id]
 
-            elif user_command in disagreement_words and user_id in buf_userdict:
-                out_dict = self.json_generator("Хорошо, попробуйте произнести название группы еще раз")
-                del buf_userdict[user_id]
+            mongo.set_usergroup(
+                user_id, user_data["group_id"], user_data["group_name"])
+            message_str = "Хорошо, я выставила группу {} для вас. Скажите \"расписание на сегодня\" для получения расписания.\nТакже могу подсказать расписание на завтра и любую другую дату".format(
+                user_data["group_name"])
+            out_dict = UtilClass.json_generator(
+                message_str, ["Расписание на сегодня", "Расписание на завтра"])
+            del buf_userdict[user_id]
 
-            #Пользователь всёж сказал именно название группы
-            else:
-                user_command = req["request"]["command"]
-                #Ищем группу
-                search_flag, search_dict = self.search_group(user_command)
-                if not search_flag:
-                    out_dict = self.json_generator("Я не смогла найти вашу группу, извините.\nМожет попробуете назвать ее заново?")
+        # Если пользователь не согласился со своей группой
 
-                else:
-                    out_dict = self.json_generator("Ваша группа относится к "+search_dict["description"]+", правильно ?",["Да", "Нет"])
-                    buf_userdict[user_id] = search_dict
+        elif user_command in disagreement_words and user_id in buf_userdict:
+            out_dict = UtilClass.json_generator(
+                "Хорошо, попробуйте произнести название группы еще раз")
+            del buf_userdict[user_id]
 
-
+        # Пользователь всёж сказал именно название группы
         else:
-            
-            #Если действующий пользователь, то даем ему одно из расписаний
             user_command = req["request"]["command"]
-            obj = UserCommandsClass(user_id, user_command)
-            out_dict = self.json_generator(obj.out_str, obj.out_buttons)
-        
-        return out_dict
-           
+            # Ищем группу
+            search_flag, search_dict = UtilClass.search_group(user_command)
+            if not search_flag:
+                out_dict = UtilClass.json_generator(
+                    "Я не смогла найти вашу группу, извините.\nМожет попробуете назвать ее заново?")
 
-api.add_resource(MainClass, '/')
+            else:
+                out_dict = UtilClass.json_generator(
+                    "Ваша группа относится к "+search_dict["description"]+", правильно ?", ["Да", "Нет"])
+                buf_userdict[user_id] = search_dict
+
+    else:
+
+        # Если действующий пользователь, то даем ему одно из расписаний
+        user_command = req["request"]["command"]
+        obj = UserCommandsClass(user_id, user_command)
+        out_dict = UtilClass.json_generator(obj.out_str, obj.out_buttons, obj.end_session)
+
+    return out_dict
 
 
 if __name__ == '__main__':
