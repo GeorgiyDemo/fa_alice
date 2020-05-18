@@ -37,3 +37,7 @@ class MongoUserClass(MongoClass):
     def update_usergroup(self, user_id, group_id, group_name):
         """Обновляем группу пользователя"""
         self.users_table.update_one({"user_id": user_id}, {"$set": {"group_id": group_id,"group_name" : group_name}})
+
+    def remove_user(self, user_id):
+        """Удаление пользователя из БД. Необходимо для изменения группы"""
+        self.users_table.delete_one({"user_id": user_id})

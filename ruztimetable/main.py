@@ -57,17 +57,17 @@ def main():
 
             mongo.set_usergroup(
                 user_id, user_data["group_id"], user_data["group_name"])
-            message_str = "Хорошо, я выставила группу {} для вас. Скажите \"расписание на сегодня\" для получения расписания.\nТакже могу подсказать расписание на завтра и любую другую дату".format(
+            message_str = "Хорошо, я запомнила твою группу. Скажи \"Сегодня\" или \"Расписание\" для получения расписания на сегодня.".format(
                 user_data["group_name"])
             out_dict = UtilClass.json_generator(
-                message_str, ["Расписание на сегодня", "Расписание на завтра"])
+                message_str, ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"])
             del buf_userdict[user_id]
 
         # Если пользователь не согласился со своей группой
 
         elif user_command in disagreement_words and user_id in buf_userdict:
             out_dict = UtilClass.json_generator(
-                "Хорошо, попробуйте произнести название группы еще раз")
+                "Хорошо, попробуй произнести название группы еще раз")
             del buf_userdict[user_id]
 
         # Пользователь всёж сказал именно название группы
@@ -77,11 +77,11 @@ def main():
             search_flag, search_dict = UtilClass.search_group(user_command)
             if not search_flag:
                 out_dict = UtilClass.json_generator(
-                    "Я не смогла найти вашу группу, извините.\nМожет попробуете назвать ее заново?")
+                    "Я не смогла найти твою группу, извини.\nМожет попробуешь назвать ее заново?")
 
             else:
                 out_dict = UtilClass.json_generator(
-                    "Ваша группа относится к "+search_dict["description"]+", правильно ?", ["Да", "Нет"])
+                    "Твоя группа относится к "+search_dict["description"]+", правильно ?", ["Да", "Нет"])
                 buf_userdict[user_id] = search_dict
 
     else:
