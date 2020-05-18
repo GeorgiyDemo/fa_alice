@@ -17,8 +17,6 @@
 """
 
 from flask import Flask, request
-from flask_restful import Resource
-import json
 from mongo_module import MongoUserClass
 from user_module import UserCommandsClass
 from util_module import UtilClass
@@ -66,8 +64,10 @@ def main():
         # Если пользователь не согласился со своей группой
 
         elif user_command in disagreement_words and user_id in buf_userdict:
-            out_dict = UtilClass.json_generator(
-                "Хорошо, попробуй произнести название группы еще раз")
+
+            suggestions = buf_userdict[user_id]["suggestions"]
+            suggestions = None if suggestions == [] else suggestions
+            out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз", suggestions)
             del buf_userdict[user_id]
 
         # Пользователь всёж сказал именно название группы
@@ -78,10 +78,10 @@ def main():
             if not search_flag:
                 out_dict = UtilClass.json_generator(
                     "Я не смогла найти твою группу, извини.\nМожет попробуешь назвать ее заново?")
-
             else:
-                out_dict = UtilClass.json_generator(
-                    "Твоя группа относится к "+search_dict["description"]+", правильно ?", ["Да", "Нет"])
+                string = "Твоя группа {} и относится к {}, правильно ?".format(search_dict["group_name"],
+                                                                               search_dict["description"])
+                out_dict = UtilClass.json_generator(string, ["Да", "Нет"])
                 buf_userdict[user_id] = search_dict
 
     else:
