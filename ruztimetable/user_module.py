@@ -57,21 +57,22 @@ class UserCommandsClass():
 
     def timetable_today(self):
         """Расписание на сегодня"""
-        date = datetime.datetime.now()
+        date = datetime.datetime.utcnow()
+        date += datetime.timedelta(hours=3)
         l = [date.strftime("%Y.%m.%d"), date.strftime("%d.%m.%Y")]
         self.out_str = self.get_timetable(*l)
         self.out_buttons = self.defaultbutton
 
     def timetable_tomorrow(self):
         """Расписание на завтра"""
-        date = datetime.datetime.now() + datetime.timedelta(days=1)
+        date = datetime.datetime.utcnow() + datetime.timedelta(days=1,hours=3)
         l = [date.strftime("%Y.%m.%d"), date.strftime("%d.%m.%Y")]
         self.out_str = self.get_timetable(*l)
         self.out_buttons = self.defaultbutton
 
     def timetable_aftertomorrow(self):
         """Расписание на послезавтра"""
-        date = datetime.datetime.now() + datetime.timedelta(days=2)
+        date = datetime.datetime.utcnow() + datetime.timedelta(days=2,hours=3)
         l = [date.strftime("%Y.%m.%d"), date.strftime("%d.%m.%Y")]
         self.out_str = self.get_timetable(*l)
         self.out_buttons = self.defaultbutton
