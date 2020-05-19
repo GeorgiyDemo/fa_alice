@@ -20,14 +20,21 @@ class UserCommandsClass():
         router_dict = {
             "": self.begining,
             "Расписание": self.timetable_today,
+            "расписание": self.timetable_today,
             "Сегодня": self.timetable_today,
+            "сегодня": self.timetable_today,
             "Завтра": self.timetable_tomorrow,
+            "завтра": self.timetable_tomorrow,
             "Послезавтра": self.timetable_aftertomorrow,
+            "послезавтра": self.timetable_aftertomorrow,
             "Завершить": self.exit,
+            "завершить": self.exit,
             "Спасибо": self.exit,
+            "спасибо": self.exit,
             "Выход": self.exit,
-            "Стоп": self.exit,
+            "выход": self.exit,
             "Изменение группы": self.changegroup,
+            "изменение группы": self.changegroup,
         }
 
         if command in router_dict:
