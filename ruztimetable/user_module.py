@@ -93,7 +93,7 @@ class UserCommandsClass():
         timetable = fa.timetable_group(group_id, date_fa, date_fa)
 
         if len(timetable) == 0:
-            return "Сегодня пар нет, отдыхайте!"
+            return "Пар нет, отдыхайте!"
         out_str = "Расписание {} на {}:\n".format(group_name, date_normal)
 
         for t in timetable:

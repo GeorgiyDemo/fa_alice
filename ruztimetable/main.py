@@ -32,7 +32,7 @@ def main():
     
     # Если новый пользователь и его нет в таблице, значит это самое начало
     elif req['session']['new'] and mongo.find_user(user_id):
-        string = "Привет! Я могу рассказать о твоем расписании в Финансовом Университете\nДля начала скажи название своей группы"
+        string = "Привет! Я могу рассказать о твоем расписании в Финансовом Университете\nДля начала скажи название своей группы."
         out_dict = UtilClass.json_generator(string)
 
     # Если новый пользователь сказал название группы
@@ -62,7 +62,7 @@ def main():
 
             suggestions = buf_userdict[user_id]["suggestions"]
             suggestions = None if suggestions == [] else suggestions
-            out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз", suggestions)
+            out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз.", suggestions)
             del buf_userdict[user_id]
 
         # Пользователь всёж сказал именно название группы
