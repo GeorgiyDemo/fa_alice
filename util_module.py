@@ -27,6 +27,7 @@ class UtilClass:
         group_name = group_name.replace(" ", "")
 
         fa = FaAPI()
+
         # Получаем информацию о группе
         groups = fa.search_group(group_name)
         if len(groups) == 0:
