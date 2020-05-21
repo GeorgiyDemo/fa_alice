@@ -12,8 +12,40 @@ class MongoClass:
         self.connection = myclient['fa_alice']
 
 
+class MongoBufferClass(MongoClass):
+    """Класс хранения временных данных пользователей"""
+
+    def __init__(self):
+        super().__init__()
+        self.buf_table = self.connection["buffer"]
+    
+    def user_exist(self, user_id):
+        """Проверяет на существование данных"""
+
+        if self.buf_table.find_one({"user_id": user_id}) is None:
+            return False
+        return True
+
+    def add_data(self, user_id, userdata_dict):
+        """Добавление данных"""
+        insert_dict = {}
+        insert_dict["user_id"] = user_id
+        insert_dict.update(userdata_dict)
+        self.buf_table.insert_one(insert_dict)
+
+    def get_data(self, user_id):
+        """Получение данных"""
+
+        r = self.buf_table.find_one({"user_id": user_id}, {"_id": 0, "user_id" : 0})
+        return r
+
+    def remove_data(self, user_id):
+        """Удаление данных"""
+
+        self.buf_table.delete_one({"user_id": user_id})
+
 class MongoUserClass(MongoClass):
-    """Класс для работы с пользователями"""
+    """Класс для работы с таблицей пользователей"""
 
     def __init__(self):
         super().__init__()

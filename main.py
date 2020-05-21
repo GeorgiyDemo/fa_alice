@@ -4,14 +4,13 @@
 """
 
 from flask import Flask, request
-from mongo_module import MongoUserClass
+from mongo_module import MongoUserClass, MongoBufferClass
 from user_module import UserCommandsClass
 from util_module import UtilClass
 
 app = Flask(__name__)
-mongo = MongoUserClass()
-buf_userdict = {}
-
+user_mongo = MongoUserClass()
+buf_mongo = MongoBufferClass()
 
 @app.route('/', methods=['POST'])
 def main():
@@ -32,12 +31,12 @@ def main():
         out_dict = UtilClass.json_generator(string)
     
     # Если новый пользователь и его нет в таблице, значит это самое начало
-    elif req['session']['new'] and mongo.find_user(user_id):
+    elif req['session']['new'] and user_mongo.find_user(user_id):
         string = "Привет! Я могу рассказать о твоем расписании в Финуниверситете.\nДля начала скажи название своей группы."
         out_dict = UtilClass.json_generator(string)
 
     # Если новый пользователь сказал название группы
-    elif mongo.find_user(user_id):
+    elif user_mongo.find_user(user_id):
 
 
         agreement_words = ["ага", "Ага", "Ды", "Да", "да",
@@ -46,25 +45,26 @@ def main():
                               "неправильно", "неверно", "Неверно", "Неправильно"]
 
         # Если пользователь согласился с тем, что это его группа
-        if user_command in agreement_words and user_id in buf_userdict:
-            user_data = buf_userdict[user_id]
+        if user_command in agreement_words and buf_mongo.user_exist(user_id):
+            user_data = buf_mongo.get_data(user_id)
 
-            mongo.set_usergroup(
+            user_mongo.set_usergroup(
                 user_id, user_data["group_id"], user_data["group_name"])
             message_str = "Хорошо, я запомнила твою группу. Скажи \"Сегодня\" или \"Расписание\" для получения расписания на сегодня.".format(
                 user_data["group_name"])
             out_dict = UtilClass.json_generator(
                 message_str, ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"])
-            del buf_userdict[user_id]
+            
+            buf_mongo.remove_data(user_id)
 
         # Если пользователь не согласился со своей группой
 
-        elif user_command in disagreement_words and user_id in buf_userdict:
+        elif user_command in disagreement_words and buf_mongo.user_exist(user_id):
 
-            suggestions = buf_userdict[user_id]["suggestions"]
+            suggestions = buf_mongo.get_data(user_id)["suggestions"]
             suggestions = None if suggestions == [] else suggestions
             out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз.", suggestions)
-            del buf_userdict[user_id]
+            buf_mongo.remove_data(user_id)
 
         # Пользователь всёж сказал именно название группы
         else:
@@ -78,7 +78,7 @@ def main():
                 string = "Твоя группа {} и относится к {}, правильно?".format(search_dict["group_name"],
                                                                                search_dict["description"])
                 out_dict = UtilClass.json_generator(string, ["Да", "Нет"])
-                buf_userdict[user_id] = search_dict
+                buf_mongo.add_data(user_id, search_dict)
 
     else:
 

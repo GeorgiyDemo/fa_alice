@@ -43,7 +43,7 @@ class UtilClass:
 
         return_dict = {}
         return_dict["description"] = description
-        return_dict["group_name"] = groups[0]["label"]
+        return_dict["group_name"] = groups[0]["label"].replace(" ", "")
         return_dict["group_id"] = groups[0]["id"]
         return_dict["suggestions"] = suggestions
 
