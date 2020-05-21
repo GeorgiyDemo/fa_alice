@@ -45,8 +45,8 @@ def main():
                               "неправильно", "неверно", "Неверно", "Неправильно"]
 
         # Если пользователь согласился с тем, что это его группа
-        if user_command in agreement_words and buf_mongo.user_exist(user_id):
-            user_data = buf_mongo.get_data(user_id)
+        if user_command in agreement_words and buf_mongo.user_exist(user_id=user_id):
+            user_data = buf_mongo.get_data(user_id=user_id)
 
             user_mongo.set_usergroup(
                 user_id, user_data["group_id"], user_data["group_name"])
@@ -55,16 +55,16 @@ def main():
             out_dict = UtilClass.json_generator(
                 message_str, ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"])
             
-            buf_mongo.remove_data(user_id)
+            buf_mongo.remove_data(user_id=user_id)
 
         # Если пользователь не согласился со своей группой
 
-        elif user_command in disagreement_words and buf_mongo.user_exist(user_id):
+        elif user_command in disagreement_words and buf_mongo.user_exist(user_id=user_id):
 
             suggestions = buf_mongo.get_data(user_id)["suggestions"]
             suggestions = None if suggestions == [] else suggestions
             out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз.", suggestions)
-            buf_mongo.remove_data(user_id)
+            buf_mongo.remove_data(user_id=user_id)
 
         # Пользователь всёж сказал именно название группы
         else:
@@ -79,7 +79,7 @@ def main():
                                                                                search_dict["description"])
                 out_dict = UtilClass.json_generator(string, ["Да", "Нет"])
                 print(search_dict)
-                buf_mongo.add_data(user_id, userdata_dict=search_dict)
+                buf_mongo.add_data(user_id=user_id, userdata_dict=search_dict)
 
     else:
 
