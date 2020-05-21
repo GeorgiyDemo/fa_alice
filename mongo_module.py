@@ -28,7 +28,6 @@ class MongoBufferClass(MongoClass):
 
     def add_data(self, user_id, userdata_dict):
         """Добавление данных"""
-
         insert_dict = {}
         insert_dict["user_id"] = user_id
         insert_dict.update(userdata_dict)

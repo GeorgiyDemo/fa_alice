@@ -78,6 +78,7 @@ def main():
                 string = "Твоя группа {} и относится к {}, правильно?".format(search_dict["group_name"],
                                                                                search_dict["description"])
                 out_dict = UtilClass.json_generator(string, ["Да", "Нет"])
+                print(search_dict)
                 buf_mongo.add_data(user_id, search_dict)
 
     else:
