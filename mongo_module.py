@@ -39,7 +39,7 @@ class MongoBufferClass(MongoClass):
         r = self.buf_table.find_one({"user_id": user_id}, {"_id": 0, "user_id" : 0})
         return r
 
-    def remove_date(self, user_id):
+    def remove_data(self, user_id):
         """Удаление данных"""
 
         self.buf_table.delete_one({"user_id": user_id})

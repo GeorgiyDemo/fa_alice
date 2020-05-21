@@ -55,7 +55,7 @@ def main():
             out_dict = UtilClass.json_generator(
                 message_str, ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"])
             
-            buf_mongo.remove_date(user_id)
+            buf_mongo.remove_data(user_id)
 
         # Если пользователь не согласился со своей группой
 
@@ -64,7 +64,7 @@ def main():
             suggestions = buf_mongo.get_data(user_id)["suggestions"]
             suggestions = None if suggestions == [] else suggestions
             out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз.", suggestions)
-            buf_mongo.remove_date(user_id)
+            buf_mongo.remove_data(user_id)
 
         # Пользователь всёж сказал именно название группы
         else:
@@ -79,7 +79,7 @@ def main():
                                                                                search_dict["description"])
                 out_dict = UtilClass.json_generator(string, ["Да", "Нет"])
                 print(search_dict)
-                buf_mongo.add_data(user_id, search_dict)
+                buf_mongo.add_data(user_id, userdata_dict=search_dict)
 
     else:
 
