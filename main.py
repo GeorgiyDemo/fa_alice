@@ -70,7 +70,6 @@ def main():
         else:
 
             # Ищем группу
-            user_command = user_command.replace(" ", "")
             search_flag, search_dict = UtilClass.search_group(user_command)
             if not search_flag:
                 out_dict = UtilClass.json_generator(
