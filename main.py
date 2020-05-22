@@ -68,7 +68,7 @@ def main():
 
         # Пользователь всёж сказал именно название группы
         else:
-
+            print(request.json)
             # Ищем группу
             search_flag, search_dict = UtilClass.search_group(user_command)
             if not search_flag:
