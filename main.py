@@ -4,9 +4,10 @@
 """
 
 from flask import Flask, request
-from mongo_module import MongoUserClass, MongoBufferClass
-from user_module import UserCommandsClass
-from util_module import UtilClass
+from modules.mongo_module import MongoUserClass, MongoBufferClass
+from modules.user_module import UserCommandsClass
+from modules.util_module import UtilClass
+from modules.searchgroup_module import SearchGroup
 
 app = Flask(__name__)
 user_mongo = MongoUserClass()
@@ -69,24 +70,23 @@ def main():
 
         elif user_command in disagreement_words and buf_mongo.user_exist(user_id):
 
-            suggestions = buf_mongo.get_data(user_id)["suggestions"]
-            suggestions = None if suggestions == [] else suggestions
-            out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз.", suggestions)
+            out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз.")
             buf_mongo.remove_data(user_id)
 
         # Пользователь всёж сказал именно название группы
         else:
 
             # Ищем группу
-            search_flag, search_dict = UtilClass.search_group(user_command)
-            if not search_flag:
-                out_dict = UtilClass.json_generator(
-                    "Я не смогла найти твою группу, извини.\nМожет попробуешь назвать ее заново?")
-            else:
-                string = "Твоя группа {} и относится к {}, правильно?".format(search_dict["group_name"],
-                                                                               search_dict["description"])
+            search_obj = SearchGroup(req["request"]["nlu"]["tokens"])
+            #Если существует
+            if search_obj.exists:
+                string = "Твоя группа {}, правильно?".format(search_obj.group_label_original)
                 out_dict = UtilClass.json_generator(string, ["Да", "Нет"])
-                buf_mongo.add_data(user_id, search_dict)
+                buf_mongo.set_data(user_id, search_obj.group_dict)
+            else:
+                string = "Я не смогла найти твою группу, извини.\nМожет попробуешь назвать ее заново?"
+                out_dict = UtilClass.json_generator(string)
+            
 
     else:
 

@@ -26,7 +26,7 @@ class MongoBufferClass(MongoClass):
             return False
         return True
 
-    def add_data(self, user_id, userdata_dict):
+    def set_data(self, user_id, userdata_dict):
         """Добавление данных"""
         insert_dict = {}
         insert_dict["user_id"] = user_id
@@ -73,3 +73,13 @@ class MongoUserClass(MongoClass):
     def remove_user(self, user_id):
         """Удаление пользователя из БД. Необходимо для изменения группы"""
         self.users_table.delete_one({"user_id": user_id})
+
+class MongoGroupsClass(MongoClass):
+    """Класс для работы с таблицей групп"""
+    def __init__(self):
+        super().__init__()
+        self.groups_table = self.connection["groups"]
+
+    def get_groups(self):
+        """Получаем все группы из таблицы"""
+        return list(self.groups_table.find({}, {"_id": 0}))

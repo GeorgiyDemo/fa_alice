@@ -1,7 +1,7 @@
 import datetime
 
 from fa_api import FaAPI
-from mongo_module import MongoUserClass
+from .mongo_module import MongoUserClass
 
 
 class UserCommandsClass():
