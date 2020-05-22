@@ -18,7 +18,15 @@ def main():
 
     out_dict = {}
     req = request.json
-    user_id = req['session']['user_id']
+
+    #Если пользователь авторизован с акком Яндекса
+    if "user" in req['session']:
+        user_id = req['session']['user']['user_id']
+    
+    #Если без акка Яндекса
+    else:
+        user_id = req['session']['application']['application_id']
+
     user_command = req["request"]["command"]
 
     #Помощь и объяснение того, что происходит
