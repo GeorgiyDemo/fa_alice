@@ -7,7 +7,7 @@ from .util_module import UtilClass
 class UserTokensClass():
     """Класс обработки команд от пользователя"""
 
-    def __init__(self, user_id, tokens_list):
+    def __init__(self, user_id, tokens_list, user_command):
 
         self.out_str = None
         self.out_buttons = None
@@ -18,7 +18,7 @@ class UserTokensClass():
         self.defaultbutton = ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"]
 
         #Список команд + словарь ассоциаций с методами
-        words_list = ["", "расписание", "сегодня", "завтра", "послезавтра", "завершить", "спасибо", "выход", "изменение", "замена"]
+        words_list = ["расписание", "сегодня", "завтра", "послезавтра", "завершить", "спасибо", "выход", "изменение", "замена"]
         router_dict = {
             "": self.begining,
             "расписание": self.timetable_today,
@@ -35,6 +35,8 @@ class UserTokensClass():
         result, detected_words = UtilClass.wordintokens_any(words_list, tokens_list)
         if result and len(detected_words) == 1:
             router_dict[detected_words[0]]()
+        elif user_command == "":
+            router_dict[user_command]()
         else:
             self.out_str = "Извини, я тебя не поняла.\nСкажи 'Помощь' и я помогу"
             self.out_buttons = self.defaultbutton

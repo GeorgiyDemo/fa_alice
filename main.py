@@ -3,7 +3,6 @@
 
 """
 
-#TODO Полностью переезжаем на токены
 from flask import Flask, request
 from modules.mongo_module import MongoUserClass, MongoBufferClass
 from modules.user_module import UserTokensClass
@@ -30,6 +29,7 @@ def main():
         user_id = req['session']['application']['application_id']
 
     user_tokens = req["request"]["nlu"]["tokens"]
+    user_command = req["request"]["command"]
 
     #Помощь и объяснение того, что происходит
     if UtilClass.wordintokens_full(["помощь"], user_tokens):
@@ -88,7 +88,7 @@ def main():
     else:
 
         # Если действующий пользователь, то даем ему одно из расписаний
-        obj = UserTokensClass(user_id, user_tokens)
+        obj = UserTokensClass(user_id, user_tokens, user_command)
         out_dict = UtilClass.json_generator(obj.out_str, obj.out_buttons, obj.end_session)
 
     return out_dict
