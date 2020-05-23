@@ -5,7 +5,7 @@
 
 from flask import Flask, request
 from modules.mongo_module import MongoUserClass, MongoBufferClass
-from modules.user_module import UserCommandsClass
+from modules.user_module import UserTokensClass
 from modules.util_module import UtilClass
 from modules.searchgroup_module import SearchGroup
 
@@ -28,14 +28,15 @@ def main():
     else:
         user_id = req['session']['application']['application_id']
 
+    user_tokens = req["request"]["nlu"]["tokens"]
     user_command = req["request"]["command"]
 
     #Помощь и объяснение того, что происходит
-    if "Помощь" in user_command or "помощь" in user_command:
+    if UtilClass.wordintokens_full(["помощь"], user_tokens):
         string = "Для начала мне необходимо узнать твою группу. После этого ты можешь получить расписание на сегодня, завтра и послезавтра одноименными командами."
         out_dict = UtilClass.json_generator(string)
     
-    elif "Что ты умеешь" in user_command or "что ты умеешь" in user_command:
+    elif UtilClass.wordintokens_full(["что","ты","умеешь"], user_tokens):
         string = "Я могу подсказать тебе расписание Финуниверситета на сегодня, завтра и послезавтра. Для этого скажи 'сегодня', 'завтра' или 'послезавтра'"
         out_dict = UtilClass.json_generator(string)
     
@@ -48,17 +49,14 @@ def main():
     elif user_mongo.find_user(user_id):
 
 
-        agreement_words = ["ага", "Ага", "Ды", "Да", "да",
-                           "ды", "верно", "Верно", "Правильно", "правильно"]
-        disagreement_words = ["не", "Нет", "Не", "Нит","нет"
-                              "неправильно", "неверно", "Неверно", "Неправильно"]
+        agreement_words = ["ага", "ды", "да", "верно", "правильно"]
+        disagreement_words = ["не", "нит","нет","неправильно", "неверно"]
 
         # Если пользователь согласился с тем, что это его группа
-        if user_command in agreement_words and buf_mongo.user_exist(user_id):
+        if UtilClass.wordintokens_any(agreement_words, user_tokens)[0] and buf_mongo.user_exist(user_id):
             user_data = buf_mongo.get_data(user_id)
 
-            user_mongo.set_usergroup(
-                user_id, user_data["group_id"], user_data["group_name"])
+            user_mongo.set_usergroup(user_id, user_data["group_id"], user_data["group_name"])
             message_str = "Хорошо, я запомнила твою группу. Скажи \"Сегодня\" или \"Расписание\" для получения расписания на сегодня.".format(
                 user_data["group_name"])
             out_dict = UtilClass.json_generator(
@@ -67,8 +65,7 @@ def main():
             buf_mongo.remove_data(user_id)
 
         # Если пользователь не согласился со своей группой
-
-        elif user_command in disagreement_words and buf_mongo.user_exist(user_id):
+        elif UtilClass.wordintokens_any(disagreement_words, user_tokens)[0] and buf_mongo.user_exist(user_id):
 
             out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз.")
             buf_mongo.remove_data(user_id)
@@ -77,7 +74,7 @@ def main():
         else:
 
             # Ищем группу
-            search_obj = SearchGroup(req["request"]["nlu"]["tokens"])
+            search_obj = SearchGroup(user_tokens)
             #Если существует
             if search_obj.exists:
                 string = "Твоя группа {}, правильно?".format(search_obj.group_label_original)
@@ -91,7 +88,7 @@ def main():
     else:
 
         # Если действующий пользователь, то даем ему одно из расписаний
-        obj = UserCommandsClass(user_id, user_command)
+        obj = UserTokensClass(user_id, user_tokens, user_command)
         out_dict = UtilClass.json_generator(obj.out_str, obj.out_buttons, obj.end_session)
 
     return out_dict

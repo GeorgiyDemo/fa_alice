@@ -2,12 +2,12 @@ import datetime
 
 from fa_api import FaAPI
 from .mongo_module import MongoUserClass
+from .util_module import UtilClass
 
-
-class UserCommandsClass():
+class UserTokensClass():
     """Класс обработки команд от пользователя"""
 
-    def __init__(self, user_id, command):
+    def __init__(self, user_id, tokens_list, user_command):
 
         self.out_str = None
         self.out_buttons = None
@@ -17,28 +17,26 @@ class UserCommandsClass():
         self.connector = MongoUserClass()
         self.defaultbutton = ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"]
 
+        #Список команд + словарь ассоциаций с методами
+        words_list = ["расписание", "сегодня", "завтра", "послезавтра", "завершить", "спасибо", "выход", "изменение", "замена"]
         router_dict = {
             "": self.begining,
-            "Расписание": self.timetable_today,
             "расписание": self.timetable_today,
-            "Сегодня": self.timetable_today,
             "сегодня": self.timetable_today,
-            "Завтра": self.timetable_tomorrow,
             "завтра": self.timetable_tomorrow,
-            "Послезавтра": self.timetable_aftertomorrow,
             "послезавтра": self.timetable_aftertomorrow,
-            "Завершить": self.exit,
             "завершить": self.exit,
-            "Спасибо": self.exit,
             "спасибо": self.exit,
-            "Выход": self.exit,
             "выход": self.exit,
-            "Изменение группы": self.changegroup,
-            "изменение группы": self.changegroup,
+            "изменение": self.changegroup,
+            "замена" : self.changegroup,
         }
 
-        if command in router_dict:
-            router_dict[command]()
+        result, detected_words = UtilClass.wordintokens_any(words_list, tokens_list)
+        if result and len(detected_words) == 1:
+            router_dict[detected_words[0]]()
+        elif user_command == "":
+            router_dict[user_command]()
         else:
             self.out_str = "Извини, я тебя не поняла.\nСкажи 'Помощь' и я помогу"
             self.out_buttons = self.defaultbutton
