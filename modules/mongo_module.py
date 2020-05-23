@@ -28,10 +28,9 @@ class MongoBufferClass(MongoClass):
 
     def set_data(self, user_id, userdata_dict):
         """Добавление данных"""
-        insert_dict = {}
-        insert_dict["user_id"] = user_id
-        insert_dict.update(userdata_dict)
-        self.buf_table.insert_one(insert_dict)
+
+        userdata_dict["user_id"] = user_id
+        self.buf_table.insert_one(userdata_dict)
 
     def get_data(self, user_id):
         """Получение данных"""
@@ -42,7 +41,7 @@ class MongoBufferClass(MongoClass):
     def remove_data(self, user_id):
         """Удаление данных"""
 
-        self.buf_table.delete_one({"user_id": user_id})
+        self.buf_table.delete_many({"user_id": user_id})
 
 class MongoUserClass(MongoClass):
     """Класс для работы с таблицей пользователей"""

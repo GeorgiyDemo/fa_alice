@@ -55,20 +55,17 @@ def main():
         # Если пользователь согласился с тем, что это его группа
         if UtilClass.wordintokens_any(agreement_words, user_tokens)[0] and buf_mongo.user_exist(user_id):
             user_data = buf_mongo.get_data(user_id)
-
+            buf_mongo.remove_data(user_id)
             user_mongo.set_usergroup(user_id, user_data["group_id"], user_data["group_name"])
             message_str = "Хорошо, я запомнила твою группу. Скажи \"Сегодня\" или \"Расписание\" для получения расписания на сегодня.".format(
                 user_data["group_name"])
             out_dict = UtilClass.json_generator(
                 message_str, ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"])
-            
-            buf_mongo.remove_data(user_id)
 
         # Если пользователь не согласился со своей группой
         elif UtilClass.wordintokens_any(disagreement_words, user_tokens)[0] and buf_mongo.user_exist(user_id):
-
-            out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз.")
             buf_mongo.remove_data(user_id)
+            out_dict = UtilClass.json_generator("Хорошо, попробуй произнести название группы еще раз.")
 
         # Пользователь всёж сказал именно название группы
         else:
