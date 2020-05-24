@@ -1,8 +1,0 @@
-{
-    "name": "faalice",
-    "description": "Yandex.Dialogs Alice App for fa.ru",
-    "image": "heroku/python",
-    "repository": "https://github.com/GeorgiyDemo/fa_alice",
-    "keywords": ["python"]
-  }
-  
