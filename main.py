@@ -58,8 +58,7 @@ def main():
             user_data = buf_mongo.get_data(user_id)
             buf_mongo.remove_data(user_id)
             user_mongo.set_usergroup(user_id, user_data["group_id"], user_data["group_name"])
-            message_str = "Хорошо, я запомнила твою группу. Скажи \"Сегодня\" или \"Расписание\" для получения расписания на сегодня.".format(
-                user_data["group_name"])
+            message_str = "Хорошо, я запомнила твою группу. Скажи \"Сегодня\" или \"Расписание\" для получения расписания на сегодня."
             out_dict = UtilClass.json_generator(
                 message_str, ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"])
 
