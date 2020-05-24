@@ -1,6 +1,3 @@
-from fa_api import FaAPI
-
-
 class UtilClass:
 
     @staticmethod
@@ -20,12 +17,12 @@ class UtilClass:
                 {"title": txt, "hide": True} for txt in buttons]
 
         return out_dict
-    
+
     @staticmethod
     def wordintokens_full(words_list, token_list):
         """Поиск списка слов в токенах, полное совпадение"""
         return set(words_list) == set(token_list)
-    
+
     @staticmethod
     def wordintokens_any(words_list, token_list):
         """Поиск списка слов в токенах, совпадение хотя бы по одному слову"""

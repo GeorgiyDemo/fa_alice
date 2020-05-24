@@ -1,8 +1,10 @@
 import datetime
 
 from fa_api import FaAPI
+
 from .mongo_module import MongoUserClass
 from .util_module import UtilClass
+
 
 class UserTokensClass():
     """Класс обработки команд от пользователя"""
@@ -18,8 +20,9 @@ class UserTokensClass():
         self.connector = MongoUserClass()
         self.defaultbutton = ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"]
 
-        #Список команд + словарь ассоциаций с методами
-        words_list = ["расписание", "сегодня", "завтра", "послезавтра", "завершить", "спасибо", "выход", "изменение", "замена"]
+        # Список команд + словарь ассоциаций с методами
+        words_list = ["расписание", "сегодня", "завтра", "послезавтра", "завершить", "спасибо", "выход", "изменение",
+                      "замена"]
         router_dict = {
             "": self.begining,
             "расписание": self.timetable_today,
@@ -31,7 +34,7 @@ class UserTokensClass():
             "выход": self.exit,
             "выйти": self.exit,
             "изменение": self.changegroup,
-            "замена" : self.changegroup,
+            "замена": self.changegroup,
         }
 
         result, detected_words = UtilClass.wordintokens_any(words_list, tokens_list)
@@ -69,12 +72,12 @@ class UserTokensClass():
         l = [date.strftime("%Y.%m.%d"), date.strftime("%d.%m.%Y")]
         self.out_str = self.get_timetable(*l)
         self.out_buttons = self.defaultbutton
-        #Если это новая сессия, то значит команда была вызвана напрямую, а знчит надо выходить из навыка
+        # Если это новая сессия, то значит команда была вызвана напрямую, а знчит надо выходить из навыка
         self.end_session = self.new_request
 
     def timetable_tomorrow(self):
         """Расписание на завтра"""
-        date = datetime.datetime.utcnow() + datetime.timedelta(days=1,hours=3)
+        date = datetime.datetime.utcnow() + datetime.timedelta(days=1, hours=3)
         l = [date.strftime("%Y.%m.%d"), date.strftime("%d.%m.%Y")]
         self.out_str = self.get_timetable(*l)
         self.out_buttons = self.defaultbutton
@@ -82,7 +85,7 @@ class UserTokensClass():
 
     def timetable_aftertomorrow(self):
         """Расписание на послезавтра"""
-        date = datetime.datetime.utcnow() + datetime.timedelta(days=2,hours=3)
+        date = datetime.datetime.utcnow() + datetime.timedelta(days=2, hours=3)
         l = [date.strftime("%Y.%m.%d"), date.strftime("%d.%m.%Y")]
         self.out_str = self.get_timetable(*l)
         self.out_buttons = self.defaultbutton

@@ -3,20 +3,20 @@
 Заносит все в нижнем регистре для совпадения по токенам
 """
 
-import requests
 import pymongo
+import requests
 
 connection_str = ""
 
-#Получаем данные
+# Получаем данные
 r = requests.get("https://schedule.fa.ru/api/groups.json").json()
 for d in r: d["label_original"] = d["label"]
 for d in r: d["label"] = d["label"].lower()
 
-#Подключаемся к БД
+# Подключаемся к БД
 myclient = pymongo.MongoClient(connection_str)
 connection = myclient["fa_alice"]
 group_table = connection["groups"]
 
-#Заносим данные
+# Заносим данные
 group_table.insert_many(r)

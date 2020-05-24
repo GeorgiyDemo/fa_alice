@@ -18,7 +18,7 @@ class MongoBufferClass(MongoClass):
     def __init__(self):
         super().__init__()
         self.buf_table = self.connection["buffer"]
-    
+
     def user_exist(self, user_id):
         """Проверяет на существование данных"""
 
@@ -35,13 +35,14 @@ class MongoBufferClass(MongoClass):
     def get_data(self, user_id):
         """Получение данных"""
 
-        r = self.buf_table.find_one({"user_id": user_id}, {"_id": 0, "user_id" : 0})
+        r = self.buf_table.find_one({"user_id": user_id}, {"_id": 0, "user_id": 0})
         return r
 
     def remove_data(self, user_id):
         """Удаление данных"""
 
         self.buf_table.delete_many({"user_id": user_id})
+
 
 class MongoUserClass(MongoClass):
     """Класс для работы с таблицей пользователей"""
@@ -73,8 +74,10 @@ class MongoUserClass(MongoClass):
         """Удаление пользователя из БД. Необходимо для изменения группы"""
         self.users_table.delete_one({"user_id": user_id})
 
+
 class MongoGroupsClass(MongoClass):
     """Класс для работы с таблицей групп"""
+
     def __init__(self):
         super().__init__()
         self.groups_table = self.connection["groups"]

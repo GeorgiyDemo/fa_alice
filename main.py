@@ -1,17 +1,18 @@
 """
-Навык Яндекс.Алисы Расписание Финансового университета
-
+Навык Яндекс.Алисы "Расписание Финансового университета"
 """
 
 from flask import Flask, request
+
 from modules.mongo_module import MongoUserClass, MongoBufferClass
+from modules.searchgroup_module import SearchGroup
 from modules.user_module import UserTokensClass
 from modules.util_module import UtilClass
-from modules.searchgroup_module import SearchGroup
 
 app = Flask(__name__)
 user_mongo = MongoUserClass()
 buf_mongo = MongoBufferClass()
+
 
 @app.route('/', methods=['POST'])
 def main():
@@ -21,26 +22,26 @@ def main():
     req = request.json
     new_request = req['session']['new']
 
-    #Если пользователь авторизован с акком Яндекса
+    # Если пользователь авторизован с акком Яндекса
     if "user" in req['session']:
         user_id = req['session']['user']['user_id']
-    
-    #Если без акка Яндекса
+
+    # Если без акка Яндекса
     else:
         user_id = req['session']['application']['application_id']
 
     user_tokens = req["request"]["nlu"]["tokens"]
     user_command = req["request"]["command"]
 
-    #Помощь и объяснение того, что происходит
+    # Помощь и объяснение того, что происходит
     if UtilClass.wordintokens_full(["помощь"], user_tokens):
         string = "Для начала мне необходимо узнать твою группу. После этого ты можешь получить расписание на сегодня, завтра и послезавтра одноименными командами."
         out_dict = UtilClass.json_generator(string)
-    
-    elif UtilClass.wordintokens_full(["что","ты","умеешь"], user_tokens):
+
+    elif UtilClass.wordintokens_full(["что", "ты", "умеешь"], user_tokens):
         string = "Я могу подсказать тебе расписание Финуниверситета на сегодня, завтра и послезавтра. Для этого скажи 'сегодня', 'завтра' или 'послезавтра'"
         out_dict = UtilClass.json_generator(string)
-    
+
     # Если новый пользователь и его нет в таблице, значит это самое начало
     elif new_request and user_mongo.find_user(user_id):
         string = "Привет! Я могу рассказать о твоем расписании в Финуниверситете.\nДля начала скажи название своей группы."
@@ -49,9 +50,8 @@ def main():
     # Если новый пользователь сказал название группы
     elif user_mongo.find_user(user_id):
 
-
         agreement_words = ["ага", "ды", "да", "верно", "правильно"]
-        disagreement_words = ["не", "нит","нет","неправильно", "неверно"]
+        disagreement_words = ["не", "нит", "нет", "неправильно", "неверно"]
 
         # Если пользователь согласился с тем, что это его группа
         if UtilClass.wordintokens_any(agreement_words, user_tokens)[0] and buf_mongo.user_exist(user_id):
@@ -73,7 +73,7 @@ def main():
 
             # Ищем группу
             search_obj = SearchGroup(user_tokens)
-            #Если существует
+            # Если существует
             if search_obj.exists:
                 string = "Твоя группа {}, правильно?".format(search_obj.group_label_original)
                 out_dict = UtilClass.json_generator(string, ["Да", "Нет"])
@@ -81,7 +81,7 @@ def main():
             else:
                 string = "Я не смогла найти твою группу, извини.\nМожет попробуешь назвать ее заново?"
                 out_dict = UtilClass.json_generator(string)
-            
+
 
     else:
 
