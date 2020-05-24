@@ -10,8 +10,9 @@
 ## Пример интеграции со сценариями
 Для вашего удобства можно создать алиасы под запуск навыка в настройках устройства
 
+![Список сценариев](https://github.com/GeorgiyDemo/fa_alice/blob/img/img/example1.png)
 
-
+![Описание сценария](https://github.com/GeorgiyDemo/fa_alice/blob/img/img/example2.png)
 
 ## Ссылки:
 - [fa_api](https://github.com/GeorgiyDemo/fa_api) - API расписания Финансового университета
