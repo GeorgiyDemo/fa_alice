@@ -19,7 +19,7 @@ def main():
 
     out_dict = {}
     req = request.json
-    print(req)
+    new_request = req['session']['new']
 
     #Если пользователь авторизован с акком Яндекса
     if "user" in req['session']:
@@ -42,7 +42,7 @@ def main():
         out_dict = UtilClass.json_generator(string)
     
     # Если новый пользователь и его нет в таблице, значит это самое начало
-    elif req['session']['new'] and user_mongo.find_user(user_id):
+    elif new_request and user_mongo.find_user(user_id):
         string = "Привет! Я могу рассказать о твоем расписании в Финуниверситете.\nДля начала скажи название своей группы."
         out_dict = UtilClass.json_generator(string)
 
@@ -86,7 +86,7 @@ def main():
     else:
 
         # Если действующий пользователь, то даем ему одно из расписаний
-        obj = UserTokensClass(user_id, user_tokens, user_command)
+        obj = UserTokensClass(user_id, user_tokens, user_command, new_request)
         out_dict = UtilClass.json_generator(obj.out_str, obj.out_buttons, obj.end_session)
 
     return out_dict

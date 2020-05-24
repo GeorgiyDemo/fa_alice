@@ -7,13 +7,14 @@ from .util_module import UtilClass
 class UserTokensClass():
     """Класс обработки команд от пользователя"""
 
-    def __init__(self, user_id, tokens_list, user_command):
+    def __init__(self, user_id, tokens_list, user_command, new_request):
 
         self.out_str = None
         self.out_buttons = None
         self.end_session = False
 
         self.user_id = user_id
+        self.new_request = new_request
         self.connector = MongoUserClass()
         self.defaultbutton = ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"]
 
@@ -28,6 +29,7 @@ class UserTokensClass():
             "завершить": self.exit,
             "спасибо": self.exit,
             "выход": self.exit,
+            "выйти": self.exit,
             "изменение": self.changegroup,
             "замена" : self.changegroup,
         }
@@ -67,6 +69,8 @@ class UserTokensClass():
         l = [date.strftime("%Y.%m.%d"), date.strftime("%d.%m.%Y")]
         self.out_str = self.get_timetable(*l)
         self.out_buttons = self.defaultbutton
+        #Если это новая сессия, то значит команда была вызвана напрямую, а знчит надо выходить из навыка
+        self.end_session = self.new_request
 
     def timetable_tomorrow(self):
         """Расписание на завтра"""
@@ -74,6 +78,7 @@ class UserTokensClass():
         l = [date.strftime("%Y.%m.%d"), date.strftime("%d.%m.%Y")]
         self.out_str = self.get_timetable(*l)
         self.out_buttons = self.defaultbutton
+        self.end_session = self.new_request
 
     def timetable_aftertomorrow(self):
         """Расписание на послезавтра"""
@@ -81,6 +86,7 @@ class UserTokensClass():
         l = [date.strftime("%Y.%m.%d"), date.strftime("%d.%m.%Y")]
         self.out_str = self.get_timetable(*l)
         self.out_buttons = self.defaultbutton
+        self.end_session = self.new_request
 
     def get_timetable(self, date_fa, date_normal):
         """Механизм получения расписания"""
