@@ -19,6 +19,7 @@ def main():
 
     out_dict = {}
     req = request.json
+    print(req)
 
     #Если пользователь авторизован с акком Яндекса
     if "user" in req['session']:
