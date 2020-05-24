@@ -52,7 +52,7 @@ class SearchGroup:
                     locale_coords = range(match.start(), match.end())
 
                     # Если их еще нет - добавляем в общие координаты
-                    if not all([e in coords for e in locale_coords]):
+                    if not all(e in coords for e in locale_coords):
                         results.append(True)
                         coords.extend(locale_coords)
                         new_data = True
