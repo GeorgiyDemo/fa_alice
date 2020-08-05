@@ -6,7 +6,7 @@ from .mongo_module import MongoUserClass
 from .util_module import UtilClass
 
 
-class UserTokensClass():
+class UserTokensClass:
     """Класс обработки команд от пользователя"""
 
     def __init__(self, user_id, tokens_list, user_command, new_request):
@@ -21,8 +21,17 @@ class UserTokensClass():
         self.defaultbutton = ["Сегодня", "Завтра", "Послезавтра", "Изменение группы"]
 
         # Список команд + словарь ассоциаций с методами
-        words_list = ["расписание", "сегодня", "завтра", "послезавтра", "завершить", "спасибо", "выход", "изменение",
-                      "замена"]
+        words_list = [
+            "расписание",
+            "сегодня",
+            "завтра",
+            "послезавтра",
+            "завершить",
+            "спасибо",
+            "выход",
+            "изменение",
+            "замена",
+        ]
         router_dict = {
             "": self.begining,
             "расписание": self.timetable_today,
@@ -104,5 +113,7 @@ class UserTokensClass():
         out_str = "Расписание {} на {}:\n".format(group_name, date_normal)
 
         for t in timetable:
-            out_str += "{}. {} ({})\n".format(t["lessonNumberStart"], t["discipline"], t["kindOfWork"])
+            out_str += "{}. {} ({})\n".format(
+                t["lessonNumberStart"], t["discipline"], t["kindOfWork"]
+            )
         return out_str

@@ -26,7 +26,10 @@ class SearchGroup:
                 if e["label"] == self.group_label:
                     self.group_id = str(e["id"])
                     self.group_label_original = e["label_original"]
-                    self.group_dict = {"group_name": self.group_label_original, "group_id": self.group_id}
+                    self.group_dict = {
+                        "group_name": self.group_label_original,
+                        "group_id": self.group_id,
+                    }
 
     def groupbytoken(self, group):
         """

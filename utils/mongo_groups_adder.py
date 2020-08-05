@@ -10,8 +10,10 @@ connection_str = ""
 
 # Получаем данные
 r = requests.get("https://schedule.fa.ru/api/groups.json").json()
-for d in r: d["label_original"] = d["label"]
-for d in r: d["label"] = d["label"].lower()
+for d in r:
+    d["label_original"] = d["label"]
+for d in r:
+    d["label"] = d["label"].lower()
 
 # Подключаемся к БД
 myclient = pymongo.MongoClient(connection_str)
