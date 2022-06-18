@@ -14,7 +14,7 @@ user_mongo = MongoUserClass()
 buf_mongo = MongoBufferClass()
 
 
-@app.route("/", methods=["POST"])
+@app.route("/alice", methods=["POST"])
 def main():
     """Управляющая логика обработки входящего запроса на Flask"""
 

@@ -5,9 +5,9 @@ FROM python:3.9.5-slim-buster
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-ADD . /app
-WORKDIR /app
+ADD . /alice
+WORKDIR /alice
 
 RUN pip3 install -r requirements.txt
 
-WORKDIR /app/code
+WORKDIR /alice/code

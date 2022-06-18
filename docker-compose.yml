@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   flask:
-    build: app/.
+    build: alice/.
     command: gunicorn --bind 0.0.0.0:5000 main:app
     ports:
       - "5000:5000"
     environment:
       CONNECTION_STR: ${CONNECTION_STR}
     volumes:
-      - ./app/code/:/app/code/
+      - ./alice/code/:/alice/code/
     restart: always
