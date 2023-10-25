@@ -7,7 +7,7 @@ Jinja2==2.11.3
 MarkupSafe==1.1.1
 pytz==2020.1
 six==1.14.0
-Werkzeug==2.2.3
+Werkzeug==3.0.1
 fa-api==1.0
 pymongo==3.10.1
 dnspython==1.16.0
